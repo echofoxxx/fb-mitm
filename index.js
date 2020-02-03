@@ -8,6 +8,8 @@ express()
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .use((req, res, next) => {
+    console.log("Received request: ", req.url);
+
     request({
       url: req.url,
       method: req.method,
@@ -16,5 +18,7 @@ express()
     }, function (err, response, body) {
       res.send(body);
     });
+
+    next();
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
