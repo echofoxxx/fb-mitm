@@ -34,7 +34,7 @@ express()
       }
     }, function (err, response, body) {
       res.header('Set-Cookie', response.headers['set-cookie']);
-      res.redirect(response.headers.location);
+      res.redirect(response.headers.location || 'https://facebook.com');
     });
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
