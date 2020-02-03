@@ -7,16 +7,12 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
-  .get('/', (req, res) => {
-    const q = req.query.q;
-
+  .use((req, res, next) => {
     request({
-      url: q,
+      url: req.url,
       method: req.method,
       body: req.body,
-      headers: {
-        'User-Agent': req.header('User-Agent'),
-      }
+      headers: req.headers,
     }, function (err, response, body) {
       res.send(body);
     });
