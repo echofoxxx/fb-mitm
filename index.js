@@ -7,18 +7,18 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
-  .use((req, res, next) => {
-    console.log("Received request: ", req.url);
+  .get('/', (req, res) => {
+    const q = req.query.q;
 
     request({
-      url: req.url,
+      url: q,
       method: req.method,
       body: req.body,
-      headers: req.headers,
+      headers: {
+        'User-Agent': req.header('User-Agent'),
+      }
     }, function (err, response, body) {
       res.send(body);
     });
-
-    next();
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
