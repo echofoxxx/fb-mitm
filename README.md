@@ -4,4 +4,4 @@ Imitates Facebook's home page to demonstrate a MITM attack. Created for Security
 
 FOR EDUCATIONAL PURPOSES ONLY.
 
-[How it works](how-it-works.png)
+![How it works](how-it-works.png)
